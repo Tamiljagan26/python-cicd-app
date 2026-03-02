@@ -1,13 +1,11 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        APP_SERVER = "43.205.130.68"   // 🔁 replace with your App Server IP
+    }
 
-        stage('Clone Code') {
-            steps {
-                echo "Code already pulled from GitHub"
-            }
-        }
+    stages {
 
         stage('Install Dependencies') {
             steps {
@@ -15,9 +13,17 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Deploy to App Server') {
             steps {
-                echo "No tests added yet"
+                sh """
+                scp -o StrictHostKeyChecking=no -r * ubuntu@${APP_SERVER}:/var/www/pythonapp/
+
+                ssh -o StrictHostKeyChecking=no ubuntu@${APP_SERVER} '
+                    pkill -f app.py || true
+                    cd /var/www/pythonapp
+                    nohup python3 app.py > output.log 2>&1 &
+                '
+                """
             }
         }
     }
