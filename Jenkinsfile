@@ -2,14 +2,19 @@ pipeline {
     agent any
 
     environment {
-        APP_SERVER = "43.205.130.68"   // 🔁 replace with your App Server IP
+        APP_SERVER = "43.205.130.68"   // replace with your App Server IP
     }
 
     stages {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip3 install -r requirements.txt'
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
             }
         }
 
